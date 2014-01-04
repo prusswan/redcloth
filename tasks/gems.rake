@@ -16,9 +16,13 @@ namespace :build do
         exit(1)
       end
       # rvm and mingw ruby versions have to match to avoid errors
-      sh "rvm ruby-1.8.6-p398@redcloth rake cross compile RUBY_CC_VERSION=1.8.6"
-      sh "rvm ruby-1.9.1-p243@redcloth rake cross compile RUBY_CC_VERSION=1.9.1"
-      sh "rvm ruby-2.0.0-p195@redcloth rake cross compile RUBY_CC_VERSION=2.0.0"
+      # sh "rvm ruby-1.8.6-p398@redcloth rake cross compile RUBY_CC_VERSION=1.8.6"
+      # sh "rvm ruby-1.9.1-p243@redcloth rake cross compile RUBY_CC_VERSION=1.9.1"
+      # sh "rvm ruby-2.0.0-p195@redcloth rake cross compile RUBY_CC_VERSION=2.0.0"
+      %x{bash -c 'source "$HOME/.rvm/scripts/rvm"; rvm use 1.8.7; rake cross compile RUBY_CC_VERSION=1.8.6'}
+      %w[1.9.1 2.0.0].each do |v|
+        %x{bash -c 'source "$HOME/.rvm/scripts/rvm"; rvm use #{v}; rake cross compile RUBY_CC_VERSION=#{v}'}
+      end
       # This will copy the .so files to the proper place
       sh "rake cross native gem RUBY_CC_VERSION=1.8.6:1.9.1:2.0.0"
     end
@@ -31,8 +35,8 @@ namespace :build do
     desc "Build ruby, windows, and jruby gems into the pkg directory"
     task :all => [
       :clobber,
-      "rvm:spec",
-      :jruby,
+      #"rvm:spec",
+      #:jruby,
       :win,
       :build
     ]
